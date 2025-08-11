@@ -362,13 +362,6 @@ Verifica e instala todas las dependencias necesarias en el entorno virtual
 - El sistema abre cada URL en pestañas de Chrome con User-Agents aleatorios
 - **El usuario debe completar manualmente los formularios** para enviar SMS
 
-**Formato de archivo requerido:**
-```text
-https://example.com/verify?phone={number}
-https://api.service.com/sms/send?to={number}
-```
-*Nota: Reemplaza `{number}` con el número objetivo (+1234567890)*
-
 <details>
 <summary><b>🎭 Sistema de User-Agent</b></summary>
 
