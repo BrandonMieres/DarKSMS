@@ -728,13 +728,13 @@ Las herramientas externas como TBomb tienen limitaciones geográficas (solo Indi
 
 ---
 
-## 💚 **AGRADECIMIENTOS**
+## 💚 **AGRADECIMIENTOS 💚**
 
 <div align="center">
 
 <div align="center">
 
-### 💚 **AGRADECIMIENTOS**
+### 💚 **AGRADECIMIENTOS 💚**
 
 ### 👨‍💻 **Desarrollado por DarK**
 
