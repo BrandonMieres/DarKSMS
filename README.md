@@ -265,7 +265,6 @@ Automatiza la apertura de URLs de verificación SMS en pestañas de Chrome con U
 </td>
 <td>
 
-• Solicita archivo de URLs (ej: `sms1.txt`)  
 • Abre pestañas automáticamente  
 • **Usuario completa formularios manualmente**  
 • Rotación automática de User-Agent
