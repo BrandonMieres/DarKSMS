@@ -67,7 +67,7 @@ def show_banner():
 {Fore.RED}║  {Fore.LIGHTRED_EX}╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝    ╚══════╝╚═╝     ╚═╝╚══════╝{Fore.RED}  ║
 {Fore.RED}║                                                              ║
 {Fore.RED}║              {Fore.YELLOW}⚡ Herramienta de SMS Automático ⚡{Fore.RED}             ║
-{Fore.RED}║                   {Fore.CYAN}Versión 2.0 - Premium Edition{Fore.RED}              ║
+{Fore.RED}║                   {Fore.CYAN}Versión 1.0 {Fore.RED}                               ║
 {Fore.RED}║                                                              ║
 {Fore.RED}╚══════════════════════════════════════════════════════════════╝
 {Style.RESET_ALL}
