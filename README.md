@@ -734,7 +734,6 @@ Las herramientas externas como TBomb tienen limitaciones geográficas (solo Indi
 
 <div align="center">
 
-### 💚 **AGRADECIMIENTOS 💚**
 
 ### 👨‍💻 **Desarrollado por DarK**
 
