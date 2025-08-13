@@ -1,3 +1,4 @@
+
 #!/usr/bin/python3
 
 import os
@@ -103,10 +104,11 @@ def install_additional_tools():
             'name': 'TBomb',
             'repo_url': 'https://github.com/TheSpeedX/TBomb.git',
             'install_cmd': [python_cmd, '-m', 'pip', 'install', '-r', 'requirements.txt'],
-            'run_cmd': f"{python_cmd} TBomb/bomber.py",
-            'main_file': os.path.join('TBomb', 'bomber.py'),
+            'run_cmd': f"{python_cmd} bomber.py",
+            'main_file': 'bomber.py',
             'icon': '💣',
-            'description': 'Herramienta de bombardeo SMS/Llamadas'
+            'description': 'Herramienta de bombardeo SMS/Llamadas',
+            'dir': os.path.normpath(os.path.join(tools_dir, 'TBomb'))
         },
         {
             'name': 'SETSMS',
@@ -115,14 +117,15 @@ def install_additional_tools():
             'run_cmd': 'bash SETSMS.sh',
             'main_file': os.path.join('SETSMS', 'SETSMS.sh'),
             'icon': '📱',
-            'description': 'Sistema automático de envío SMS'
+            'description': 'Sistema automático de envío SMS',
+            'dir': tools_dir
         }
     ]
     
     for i, tool in enumerate(tools, 1):
         tool_name = tool['name']
         repo_url = tool['repo_url']
-        tool_dir = os.path.normpath(os.path.join(tools_dir, tool_name))
+        tool_dir = os.path.normpath(tool['dir'])
         
         print(f"\n{Fore.LIGHTMAGENTA_EX}┌─ {tool['icon']} INSTALANDO {tool_name.upper()} ({i}/{len(tools)}) ─┐{Style.RESET_ALL}")
         print(f"{Fore.LIGHTMAGENTA_EX}│ {Fore.WHITE}{tool['description']:<45} {Fore.LIGHTMAGENTA_EX}│{Style.RESET_ALL}")
@@ -233,9 +236,9 @@ def use_additional_tools():
         },
         {
             'name': 'TBomb',
-            'run_cmd': f"{python_cmd} TBomb/bomber.py",
-            'main_file': os.path.join('TBomb', 'bomber.py'),
-            'dir': tools_dir,
+            'run_cmd': f"{python_cmd} bomber.py",
+            'main_file': 'bomber.py',
+            'dir': os.path.normpath(os.path.join(tools_dir, 'TBomb')),
             'icon': '💣',
             'description': 'Bombardero SMS/Llamadas'
         },
