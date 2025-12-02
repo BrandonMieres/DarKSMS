@@ -2,6 +2,8 @@ import undetected_chromedriver as uc
 import random
 import time
 import os
+import subprocess
+import re
 from colorama import Fore
 
 # Colores
@@ -54,23 +56,64 @@ def load_user_agents():
         print(azul + "Continuando con User-Agent por defecto..." + cierre)
         return None
 
+def get_chrome_version():
+    """Detecta la versión de Chrome instalada en el sistema"""
+    try:
+        import platform
+        system = platform.system()
+        
+        if system == "Windows":
+            import winreg
+            # Intentar leer la versión desde el registro
+            try:
+                key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Google\Chrome\BLBeacon")
+                version, _ = winreg.QueryValueEx(key, "version")
+                winreg.CloseKey(key)
+                major_version = int(version.split('.')[0])
+                print(verde + f"Chrome versión detectada: {version} (v{major_version})" + cierre)
+                return major_version
+            except:
+                pass
+        
+        elif system == "Linux":
+            # Intentar obtener versión desde línea de comandos
+            result = subprocess.run(['google-chrome', '--version'], capture_output=True, text=True)
+            if result.returncode == 0:
+                version = result.stdout.strip()
+                match = re.search(r'(\d+)\.', version)
+                if match:
+                    major_version = int(match.group(1))
+                    print(verde + f"Chrome versión detectada: {version} (v{major_version})" + cierre)
+                    return major_version
+        
+        elif system == "Darwin":  # macOS
+            result = subprocess.run(['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '--version'], 
+                                  capture_output=True, text=True)
+            if result.returncode == 0:
+                version = result.stdout.strip()
+                match = re.search(r'(\d+)\.', version)
+                if match:
+                    major_version = int(match.group(1))
+                    print(verde + f"Chrome versión detectada: {version} (v{major_version})" + cierre)
+                    return major_version
+    
+    except Exception as e:
+        print(azul + f"No se pudo detectar versión de Chrome: {e}" + cierre)
+    
+    return None
+
 def create_chrome_options(user_agent=None):
     """Crea una nueva instancia de ChromeOptions con la configuración necesaria"""
     options = uc.ChromeOptions()
     
-    # Configuraciones básicas
+    # Configuraciones básicas y compatibles
     options.add_argument('--start-maximized')
     options.add_argument('--disable-blink-features=AutomationControlled')
-    options.add_argument('--disable-extensions')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--disable-gpu')
-    options.add_argument('--disable-web-security')
-    options.add_argument('--allow-running-insecure-content')
     
     # CRUCIAL: Desactivar bloqueador de popups para permitir nuevas pestañas
     options.add_argument('--disable-popup-blocking')
-    options.add_argument('--disable-features=VizDisplayCompositor')
     
     # Configurar User-Agent si se proporciona
     if user_agent:
@@ -79,20 +122,74 @@ def create_chrome_options(user_agent=None):
     return options
 
 def setup_chrome_driver(user_agent=None):
-    """Configura y retorna una instancia de Chrome driver"""
-    print(azul + "Conectando con Chrome versión 138..." + cierre)
+    """Configura y retorna una instancia de Chrome driver con detección automática de versión"""
+    print(azul + "Iniciando Chrome con configuración minimalista..." + cierre)
     
+    # Detectar versión de Chrome instalada
+    chrome_version = get_chrome_version()
+    
+    # MÉTODO 1: Sin especificar versión (más compatible)
     try:
+        print(azul + "Intento 1: Detección automática completa..." + cierre)
         options = create_chrome_options(user_agent)
-        driver = uc.Chrome(options=options, version_main=138)
-        print(verde + "¡Conexión exitosa!" + cierre)
+        driver = uc.Chrome(options=options, use_subprocess=True)
+        print(verde + "¡Conexión exitosa con detección automática!" + cierre)
         return driver
-    except Exception as e:
-        print(rojo + f"Error al conectar: {str(e)[:100]}..." + cierre)
-        print(azul + "Soluciones:" + cierre)
-        print(azul + "• Cierra todas las ventanas de Chrome" + cierre)
-        print(azul + "• Actualiza: pip install --upgrade undetected-chromedriver" + cierre)
-        return None
+    except Exception as e1:
+        print(azul + f"Intento 1 falló: {str(e1)[:80]}" + cierre)
+    
+    # MÉTODO 2: Con versión detectada
+    if chrome_version:
+        try:
+            print(azul + f"Intento 2: Usando Chrome v{chrome_version}..." + cierre)
+            options = create_chrome_options(user_agent)
+            driver = uc.Chrome(options=options, version_main=chrome_version, use_subprocess=True)
+            print(verde + f"¡Conexión exitosa con Chrome v{chrome_version}!" + cierre)
+            return driver
+        except Exception as e2:
+            print(azul + f"Intento 2 falló: {str(e2)[:80]}" + cierre)
+    
+    # MÉTODO 3: Modo súper minimalista (sin opciones personalizadas)
+    try:
+        print(azul + "Intento 3: Modo minimalista sin opciones..." + cierre)
+        driver = uc.Chrome(use_subprocess=True)
+        print(verde + "¡Conexión exitosa en modo minimalista!" + cierre)
+        return driver
+    except Exception as e3:
+        print(rojo + f"Intento 3 falló: {str(e3)[:80]}" + cierre)
+    
+    # MÉTODO 4: Último recurso - ChromeDriver estándar con selenium
+    try:
+        print(azul + "Intento 4: Usando Selenium estándar..." + cierre)
+        from selenium import webdriver
+        from selenium.webdriver.chrome.options import Options
+        
+        chrome_options = Options()
+        chrome_options.add_argument('--start-maximized')
+        chrome_options.add_argument('--disable-popup-blocking')
+        if user_agent:
+            chrome_options.add_argument(f'--user-agent={user_agent}')
+        
+        driver = webdriver.Chrome(options=chrome_options)
+        print(verde + "¡Conexión exitosa con Selenium estándar!" + cierre)
+        return driver
+    except Exception as e4:
+        print(rojo + f"Intento 4 falló: {str(e4)[:80]}" + cierre)
+    
+    # Si todos los métodos fallan
+    print(rojo + "\n❌ No se pudo inicializar Chrome con ningún método." + cierre)
+    print(azul + "\n🔧 SOLUCIONES:" + cierre)
+    print(azul + "1. Cierra TODAS las ventanas de Chrome:" + cierre)
+    print(azul + "   Windows: taskkill /F /IM chrome.exe" + cierre)
+    print(azul + "   Linux/Mac: pkill chrome" + cierre)
+    print(azul + "\n2. Actualiza Chrome a la última versión" + cierre)
+    print(azul + "\n3. Actualiza las dependencias:" + cierre)
+    print(azul + "   pip install --upgrade undetected-chromedriver selenium" + cierre)
+    print(azul + "\n4. Reinstala desde cero:" + cierre)
+    print(azul + "   pip uninstall undetected-chromedriver selenium" + cierre)
+    print(azul + "   pip install undetected-chromedriver selenium" + cierre)
+    print(azul + "\n5. Reinicia tu PC" + cierre)
+    return None
 
 def open_tabs():
     """Función principal para abrir todas las URLs en pestañas separadas"""
@@ -152,7 +249,7 @@ def open_tabs():
                     print(f"   ✓ Nueva pestaña creada - Total: {current_tabs}")
                 else:
                     # Si no funciona, usar método alternativo con Selenium
-                    print(f"   → Usando método alternativo...")
+                    print(f"   ⚠ Usando método alternativo...")
                     
                     # Método 2: Simular Ctrl+T con ActionChains
                     from selenium.webdriver.common.keys import Keys
